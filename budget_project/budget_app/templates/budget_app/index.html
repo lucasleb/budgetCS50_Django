@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget</title>
+</head>
+<body>
+    <h1>Budget Transactions</h1>
+
+    <!-- Display existing transactions -->
+    <h2>Existing Transactions:</h2>
+    <ul>
+        {% for transaction in transactions %}
+            <li>{{ transaction.amount }} ({{ transaction.date }}) - {{ transaction.description }}</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Form to create new transactions -->
+    <h2>Create New Transaction:</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ transaction_form.as_p }}
+        <button type="submit">Add Transaction</button>
+    </form>
+
+    <!-- Form to create new categories -->
+    <h2>Create New Category:</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ category_form.as_p }}
+        <button type="submit">Add Category</button>
+    </form>
+
+
+    <a href="{% url 'logout' %}">Logout </a>
+</body>
+</html>
