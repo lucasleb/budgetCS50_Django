@@ -1,38 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget</title>
-</head>
-<body>
-    <h1>Budget Transactions</h1>
+{% extends "budget_app/layout.html" %}
+{% load static %}
 
-    <!-- Display existing transactions -->
-    <h2>Existing Transactions:</h2>
+{% block style %}
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'budget_app/script.js' %}"></script>
+    
+{% endblock %}
+
+{% block body %}
+
+<h1 class="text-3xl font-semibold mb-4">Budget Transactions</h1>
+
+<div class="mb-8">
+    <h2 class="text-xl font-semibold mb-2">Create New Transaction:</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ transaction_form.non_field_errors }}
+        <div class="mb-4">
+            {{ transaction_form.amount.label_tag }} {{ transaction_form.amount }}
+        </div>
+        <div class="mb-4">
+            {{ transaction_form.date.label_tag }} {{ transaction_form.date }}
+        </div>
+         <div class="mb-4">
+            {{ transaction_form.category.label_tag }}
+            {{ transaction_form.category }}
+                <button id="openModalBtn" type="button" class="ml-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-2 rounded">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </button>  
+        </div>
+        <div class="mb-4">
+            {{ transaction_form.type.label_tag }} 
+
+            <div id="id_type">
+                <div>
+                <label for="id_type_0"><input type="radio" name="type" value="expense" required="" id="id_type_0" checked="">Expense</label>
+                </div>
+                <div>
+                <label for="id_type_1"><input type="radio" name="type" value="income" required="" id="id_type_1">Income</label>
+                </div>
+            </div>
+        </div>
+        <div class="mb-4">
+            {{ transaction_form.description.label_tag }} {{ transaction_form.description }}
+        </div>
+        <div class="mb-4">
+            {{ transaction_form.comment.label_tag }} {{ transaction_form.comment }}
+        </div>
+        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+            Add Transaction
+        </button>
+    </form>
+</div>
+
+<div class="mb-8">
+    <h2 class="text-xl font-semibold mb-2">Existing Transactions:</h2>
     <ul>
         {% for transaction in transactions %}
-            <li>{{ transaction.amount }} ({{ transaction.date }}) - {{ transaction.description }}</li>
+            <li class="mb-2">{{ transaction.amount }} ({{ transaction.date }}) - {{ transaction.description }}</li>
         {% endfor %}
     </ul>
+</div>
 
-    <!-- Form to create new transactions -->
-    <h2>Create New Transaction:</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ transaction_form.as_p }}
-        <button type="submit">Add Transaction</button>
-    </form>
+<a href="{% url 'logout' %}" class="text-blue-500 hover:underline">Logout</a>
 
-    <!-- Form to create new categories -->
-    <h2>Create New Category:</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ category_form.as_p }}
-        <button type="submit">Add Category</button>
-    </form>
+<div id="myModal" class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-40 flex justify-center items-center">
+    <div class="modal-content bg-white p-4 rounded shadow-lg">
+        <div class="flex justify-end">
+            <button id="closeModalBtn" class="text-gray-700 hover:text-gray-900">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <h1 class="text-2xl font-semibold mb-4">Create New Category:</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ category_form.as_p }}
+            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+                Add Category
+            </button>
+        </form>
+    </div>
+</div>
 
-
-    <a href="{% url 'logout' %}">Logout </a>
-</body>
-</html>
+{% endblock %}

@@ -6,6 +6,8 @@ from .models import Category, Transaction, User
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.utils import timezone 
+from django.db.models import Count
+
 
 
 
@@ -15,12 +17,18 @@ class NewTransactionForm(forms.ModelForm):
         fields = ['amount', 'date', 'category', 'type', 'description', 'comment']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
+            'type': forms.RadioSelect(choices=Transaction.CATEGORY_CHOICES),
         }
 
     def __init__(self, user, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['category'].queryset = Category.objects.filter(author=user)
         self.fields['date'].initial = timezone.now().date()
+
+        # Set the default category to the one with the most items
+        most_common_category = Category.objects.filter(author=user).annotate(num_transactions=Count('transaction')).order_by('-num_transactions').first()
+        if most_common_category:
+            self.fields['category'].initial = most_common_category
 
 
 
@@ -41,6 +49,7 @@ def index(request):
             new_transaction.author = request.user
             new_transaction.save()
             return redirect("index")
+    
 
         elif category_form.is_valid():
             new_category = category_form.save(commit=False)
